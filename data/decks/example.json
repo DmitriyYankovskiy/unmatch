@@ -1,0 +1,21 @@
+{
+    "first-card": {
+        "type": "attack",
+        "count": 3,
+        "effects": {
+            "immedietly": {
+                "say": "skibidi" 
+            }
+        }
+    },
+
+    "second-card": {
+        "type": "attack",
+        "count": 3,
+        "effects": {
+            "immedietly": {
+                "say": "dob dob dob yes yes"
+            }
+        }
+    }
+}
