@@ -2,6 +2,7 @@
     "first-card": {
         "type": "attack",
         "count": 3,
+        "fighter": "any",
         "effects": {
             "immedietly": {
                 "say": "skibidi" 
@@ -12,6 +13,7 @@
     "second-card": {
         "type": "attack",
         "count": 3,
+        "fighter": "any",
         "effects": {
             "immedietly": {
                 "say": "dob dob dob yes yes"
