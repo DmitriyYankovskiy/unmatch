@@ -1,5 +1,5 @@
 use actix_web::{get, Responder, HttpServer, App, HttpResponse, web};
-use std::{io::Result, fs, cell::RefCell, sync::Mutex};
+use std::{io::Result, fs,  sync::Mutex};
 // use std::fs::File::file_stream;
 
 mod card;
@@ -24,7 +24,7 @@ async fn game_controller(data: web::Data<game::Game>) -> impl Responder {
 } 
 
 fn init() {
-    card::get_deck("ew".to_string());
+    let _ = card::get_deck("example".to_string()).unwrap();
 }
 
 #[actix_web::main]

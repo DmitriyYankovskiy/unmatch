@@ -1,9 +1,7 @@
-use std::{vec, fs, io, collections::{hash_set, hash_map, HashMap}};
+use std::{fs, io, collections::HashMap};
 
-use actix_web::web::Json;
 use serde::{Serialize, Deserialize};
-use serde_json::{json, map};
-use io::Write; 
+use io::Result; 
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Fighter {
@@ -63,51 +61,37 @@ pub struct Card {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct CardSet {
-    count: usize,
-    card: Card,
+pub struct CardSet {
+    pub count: usize,
+    pub card: Card,
 }
 
 type Deck = HashMap<usize, CardSet>;
+ 
+pub fn get_deck(name: String) -> Result<Deck>{
+    let file = fs::read_to_string(format!("data/decks/{name}.json"))?;
 
-pub fn get_deck(name: String) {
-    // let file = fs::read_to_string(format!("/data/decks/{name}.json")).unwrap();
-    // let json_file: serde_json::Value = serde_json::from_str(&file)?;
+    let deck: Deck = serde_json::from_str(file.as_str())?;
+    return Ok(deck);
+}
 
-    let mut deck = Deck::new();
-    deck.insert(0, CardSet {
-            count: 3,
-            card: Card {
-            name: "Helio".to_string(),
 
-            class: Class::Combat(combat::Card {
-                value: 2,
-                immidietly: vec![],
-                during_combat: vec![],
-                after_combat: vec![],
+struct CardStack {
+    stack: Vec<Card>,
+}
 
-                class: combat::Class::Versatile,
-            }),
-            fighter: Fighter::Any,
-            boost: 3,
+impl CardStack {
+    fn push(&mut self, card: Card) {
+        self.stack.push(card);
+    }
+
+    pub fn from_deck(deck: Deck) -> CardStack {
+        let card_stack = CardStack { stack: vec![] };
+        for (id, card_set) in deck {
+            for i in 0..card_set.count {
+                card_stack.push(card_set.card);
+            }
         }
-    });
-
-    deck.insert(1, CardSet {
-        count: 5,
-        card: Card {
-            name: "Fireball".to_string(),
-
-            class: Class::Sheme(scheme::Card {
-                actions: vec![],
-            }),
-            fighter: Fighter::Any,
-            boost: 2,
-        }
-    });
-    
-    let mut file = fs::File::create("example.json").expect("can'not create file");
-    file.write_all(format!("{:#}", json!(deck).to_string()).as_bytes()).unwrap();
-
-    // println!("{:#?}", json!(card));
+        card_stack
+    }
 }

@@ -1,24 +1,32 @@
 {
-    "first-card": {
-        "boost": 3,
-        "class": {
-            "Combat": {
-                "after_combat": [],
-                "class": "Versatile",
-                "during_combat": [],
-                "immidietly": [],
-                "value": 2
-            }
+    "0": {
+        "card": {
+            "boost": 3,
+            "class": {
+                "Combat": {
+                    "after_combat": [],
+                    "class": "Versatile",
+                    "during_combat": [],
+                    "immidietly": [],
+                    "value": 2
+                }
+            },
+            "fighter": "Any",
+            "name": "Helio"
         },
-        "fighter": "Any"
+        "count": 3
     },
-    "second-card": {
-        "boost": 2,
-        "class": {
-            "Sheme": {
-                "actions": []
-            }
+    "1": {
+        "card": {
+            "boost": 2,
+            "class": {
+                "Sheme": {
+                    "actions": []
+                }
+            },
+            "fighter": "Any",
+            "name": "Fireball"
         },
-        "fighter": "Any"
+        "count": 5
     }
 }
