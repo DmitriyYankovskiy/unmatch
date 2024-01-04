@@ -1,23 +1,24 @@
 {
     "first-card": {
-        "type": "attack",
-        "count": 3,
-        "fighter": "any",
-        "effects": {
-            "immedietly": {
-                "say": "skibidi" 
+        "boost": 3,
+        "class": {
+            "Combat": {
+                "after_combat": [],
+                "class": "Versatile",
+                "during_combat": [],
+                "immidietly": [],
+                "value": 2
             }
-        }
+        },
+        "fighter": "Any"
     },
-
     "second-card": {
-        "type": "attack",
-        "count": 3,
-        "fighter": "any",
-        "effects": {
-            "immedietly": {
-                "say": "dob dob dob yes yes"
+        "boost": 2,
+        "class": {
+            "Sheme": {
+                "actions": []
             }
-        }
+        },
+        "fighter": "Any"
     }
 }
