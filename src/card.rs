@@ -1,16 +1,17 @@
 use std::{fs, io, collections::HashMap};
 
 use serde::{Serialize, Deserialize};
-use io::Result; 
+use io::Result;
+use rand::{thread_rng, Rng, seq::SliceRandom};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Fighter {
     Any,
     Hero,
     Support,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Actions {
 
 }
@@ -18,7 +19,7 @@ pub mod scheme {
     use serde::{Serialize, Deserialize};
     use super::Actions;
 
-    #[derive(Serialize, Deserialize, Debug)]
+    #[derive(Serialize, Deserialize, Debug, Clone)]
     pub struct Card {
         pub actions: Vec<Actions>,
     }
@@ -29,13 +30,13 @@ pub mod combat {
 
     use super::Actions;
 
-    #[derive(Serialize, Deserialize, Debug)]
+    #[derive(Serialize, Deserialize, Debug, Clone)]
     pub enum Class {
         Attack,
         Defense,
         Versatile,
     }
-    #[derive(Serialize, Deserialize, Debug)]
+    #[derive(Serialize, Deserialize, Debug, Clone)]
     pub struct Card {
         pub value: u32,
         pub immidietly: Vec<Actions>,
@@ -45,13 +46,13 @@ pub mod combat {
         pub class: Class,
     }
 }
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Class {
     Combat(combat::Card),
     Sheme(scheme::Card),
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Card {
     pub name: String,
 
@@ -60,7 +61,7 @@ pub struct Card {
     pub boost: u32,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CardSet {
     pub count: usize,
     pub card: Card,
@@ -75,23 +76,27 @@ pub fn get_deck(name: String) -> Result<Deck>{
     return Ok(deck);
 }
 
-
+#[derive(Clone)]
 struct CardStack {
     stack: Vec<Card>,
 }
 
 impl CardStack {
-    fn push(&mut self, card: Card) {
-        self.stack.push(card);
-    }
-
     pub fn from_deck(deck: Deck) -> CardStack {
-        let card_stack = CardStack { stack: vec![] };
-        for (id, card_set) in deck {
-            for i in 0..card_set.count {
-                card_stack.push(card_set.card);
+        let mut card_stack = CardStack { stack: vec![] };
+        for (_id, card_set) in deck {
+            for _i in 0..card_set.count {
+                card_stack.push(card_set.card.clone());
             }
         }
         card_stack
+    }
+
+    pub fn push(&mut self, card: Card) {
+        self.stack.push(card);
+    }
+
+    pub fn shuffle(&mut self) {
+        self.stack.shuffle(&mut thread_rng());
     }
 }

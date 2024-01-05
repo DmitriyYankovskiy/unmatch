@@ -19,9 +19,8 @@ async fn game_controller(data: web::Data<game::Game>) -> impl Responder {
             HttpResponse::Forbidden()
             .body("404")
         },
-    }
-    
-} 
+    }    
+}
 
 fn init() {
     let _ = card::get_deck("example".to_string()).unwrap();
