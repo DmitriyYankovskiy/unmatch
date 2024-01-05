@@ -1,18 +1,32 @@
-use std::sync::Mutex;
+use crate::card;
 
-#[derive(Debug)]
+pub enum GameState {
+    Setup(Setup),
+    On(Game),
+    End,
+}
+
+pub struct Setup {
+    first_deck: Option<card::CardStack>,
+    second_deck: Option<card::CardStack>,
+}
 pub struct Game {
-    pub count: Mutex<usize>,
+    first_stack: card::CardStack,
+    second_stack: card::CardStack,
+}
+
+impl GameState {
+    fn start(& mut self) -> Result<(), &str> {
+        if let GameState::Setup(setup) = self {
+            Ok(())
+        } else {
+            Err("Game already started")
+        }
+    }
 }
 
 impl Game {
-    pub fn add(& self) {
-        let mut count = self.count.lock().unwrap();
-        *count += 1;
-    }
-    
-    pub fn get(&self) -> usize {
-        let count = self.count.lock().unwrap();
-        *count
+    fn new() {
+         
     }
 }

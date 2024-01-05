@@ -6,9 +6,8 @@ mod card;
 mod game;
 
 #[get("/game")]
-async fn game_controller(data: web::Data<game::Game>) -> impl Responder {
-    data.add();
-    println!("{}", data.get());
+async fn game_controller(data: web::Data<Mutex<game::Game>>) -> impl Responder {
+    let game =  data.lock().unwrap();
     match fs::read_to_string("www/game/index.html") {
         Ok(file) => {
             HttpResponse::Ok()
@@ -29,9 +28,7 @@ fn init() {
 #[actix_web::main]
 async fn main() -> Result<()> {
     init();
-    let data = web::Data::new(game::Game {
-            count: Mutex::new(5),
-        });
+    let data = web::Data::new(Mutex::new(game::Game::new()));
     HttpServer::new(move || {
         App::new()
             .app_data(data.clone())

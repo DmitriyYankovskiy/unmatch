@@ -15,6 +15,8 @@ pub enum Fighter {
 pub enum Actions {
 
 }
+
+
 pub mod scheme {
     use serde::{Serialize, Deserialize};
     use super::Actions;
@@ -61,14 +63,16 @@ pub struct Card {
     pub boost: u32,
 }
 
+
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CardSet {
     pub count: usize,
     pub card: Card,
 }
 
-type Deck = HashMap<usize, CardSet>;
- 
+pub type Deck = HashMap<usize, CardSet>;
+
 pub fn get_deck(name: String) -> Result<Deck>{
     let file = fs::read_to_string(format!("data/decks/{name}.json"))?;
 
@@ -76,8 +80,12 @@ pub fn get_deck(name: String) -> Result<Deck>{
     return Ok(deck);
 }
 
+
+
+
+
 #[derive(Clone)]
-struct CardStack {
+pub struct CardStack {
     stack: Vec<Card>,
 }
 
