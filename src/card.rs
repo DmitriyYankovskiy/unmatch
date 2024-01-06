@@ -1,8 +1,9 @@
-use std::{fs, io, collections::HashMap};
+use rand::{seq::SliceRandom, thread_rng, Rng};
+use serde::{Deserialize, Serialize};
+use set::Set;
+use std::{collections::HashMap, fs, io::Result};
 
-use serde::{Serialize, Deserialize};
-use io::Result;
-use rand::{thread_rng, Rng, seq::SliceRandom};
+use crate::Readable;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Fighter {
@@ -12,23 +13,20 @@ pub enum Fighter {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum Actions {
-
-}
-
+pub enum Actions {}
 
 pub mod scheme {
-    use serde::{Serialize, Deserialize};
     use super::Actions;
+    use serde::{Deserialize, Serialize};
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
     pub struct Card {
-        pub actions: Vec<Actions>,
+        actions: Vec<Actions>,
     }
 }
 
 pub mod combat {
-    use serde::{Serialize, Deserialize};
+    use serde::{Deserialize, Serialize};
 
     use super::Actions;
 
@@ -40,12 +38,11 @@ pub mod combat {
     }
     #[derive(Serialize, Deserialize, Debug, Clone)]
     pub struct Card {
-        pub value: u32,
-        pub immidietly: Vec<Actions>,
-        pub during_combat: Vec<Actions>,
-        pub after_combat: Vec<Actions>,
-
-        pub class: Class,
+        value: u32,
+        immidietly: Vec<Actions>,
+        during_combat: Vec<Actions>,
+        after_combat: Vec<Actions>,
+        class: Class,
     }
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -56,33 +53,21 @@ pub enum Class {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Card {
-    pub name: String,
-
-    pub class: Class,
-    pub fighter: Fighter,
-    pub boost: u32,
+    class: Class,
+    fighter: Fighter,
+    boost: u32,
 }
 
+pub type Deck = HashMap<String, Set<Card>>;
 
+impl Readable for Deck {
+    fn from_name(name: String) -> Result<Self> {
+        let file = fs::read_to_string(format!("data/{name}.json"))?;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct CardSet {
-    pub count: usize,
-    pub card: Card,
+        let deck: Deck = serde_json::from_str(file.as_str())?;
+        return Ok(deck);
+    }
 }
-
-pub type Deck = HashMap<usize, CardSet>;
-
-pub fn get_deck(name: String) -> Result<Deck>{
-    let file = fs::read_to_string(format!("data/decks/{name}.json"))?;
-
-    let deck: Deck = serde_json::from_str(file.as_str())?;
-    return Ok(deck);
-}
-
-
-
-
 
 #[derive(Clone)]
 pub struct CardStack {
@@ -90,12 +75,10 @@ pub struct CardStack {
 }
 
 impl CardStack {
-    pub fn from_deck(deck: Deck) -> CardStack {
+    pub fn from(deck: Deck) -> CardStack {
         let mut card_stack = CardStack { stack: vec![] };
         for (_id, card_set) in deck {
-            for _i in 0..card_set.count {
-                card_stack.push(card_set.card.clone());
-            }
+            Vec::append(&mut card_stack.stack, &mut card_set.open());
         }
         card_stack
     }
