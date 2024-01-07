@@ -1,5 +1,6 @@
 use actix_web::HttpRequest;
 pub use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
+use reqwest::Response;
 use serde::{Serialize, Deserialize};
 pub use set::Set;
 use std::ops::Deref;
@@ -18,11 +19,7 @@ pub trait Readable {
 
 #[get("/game")]
 async fn game_controller(data: web::Data<Mutex<game::Game>>) -> impl Responder {
-    let game = data.lock().unwrap();
-    match fs::read_to_string("www/game/index.html") {
-        Ok(file) => HttpResponse::Ok().content_type("text/html").body(file),
-        Err(..) => HttpResponse::Forbidden().body("404"),
-    }
+    file_response("game/index.html".to_string())
 }
 
 
@@ -33,13 +30,23 @@ struct DeckName {
     name: String,
 }
 
+fn file_response(path: String) -> HttpResponse {
+    match fs::read_to_string(format!("www/{}", path)) {
+        Ok(file) => HttpResponse::Ok().content_type("text/html").body(file),
+        Err(..) => HttpResponse::Forbidden().body("404"),
+    }
+}
+
 #[get("/game/connect")]
 async fn game_connect(data: web::Data<Mutex<game::GameState>>, json: web::Json<DeckName>) -> impl Responder {
     let mut game = data.lock().unwrap();
-    game.add_player(&json.name);
-    match fs::read_to_string("www/game/new.html") {
-        Ok(file) => HttpResponse::Ok().content_type("text/html").body(file),
-        Err(..) => HttpResponse::Forbidden().body("404"),
+    match game.add_player(&json.name) {
+        Ok(id) => {
+            file_response("game/index.html".to_string())
+        },
+        Err(..) => {
+            HttpResponse::InternalServerError().body("character not found")
+        }
     }
 }
 
