@@ -6,6 +6,7 @@ use std::{collections::HashMap, fs, io::Result};
 use crate::Readable;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub enum Fighter {
     Any,
     Hero,
@@ -13,6 +14,7 @@ pub enum Fighter {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub enum Actions {}
 
 pub mod scheme {
@@ -20,6 +22,7 @@ pub mod scheme {
     use serde::{Deserialize, Serialize};
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
+    #[serde(rename_all = "camelCase")]
     pub struct Card {
         actions: Vec<Actions>,
     }
@@ -31,12 +34,14 @@ pub mod combat {
     use super::Actions;
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
+    #[serde(rename_all = "camelCase")]
     pub enum Class {
         Attack,
         Defense,
         Versatile,
     }
     #[derive(Serialize, Deserialize, Debug, Clone)]
+    #[serde(rename_all = "camelCase")]
     pub struct Card {
         value: u32,
         immidietly: Vec<Actions>,
@@ -46,12 +51,14 @@ pub mod combat {
     }
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub enum Class {
     Combat(combat::Card),
     Sheme(scheme::Card),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Card {
     class: Class,
     fighter: Fighter,
@@ -61,8 +68,8 @@ pub struct Card {
 pub type Deck = HashMap<String, Set<Card>>;
 
 impl Readable for Deck {
-    fn from_name(name: String) -> Result<Self> {
-        let file = fs::read_to_string(format!("data/{name}.json"))?;
+    fn from_path(path: String) -> Result<Self> {
+        let file = fs::read_to_string(format!("data/{path}.json"))?;
 
         let deck: Deck = serde_json::from_str(file.as_str())?;
         return Ok(deck);
@@ -75,7 +82,7 @@ pub struct CardStack {
 }
 
 impl CardStack {
-    pub fn from(deck: Deck) -> CardStack {
+    pub fn from(deck: &Deck) -> CardStack {
         let mut card_stack = CardStack { stack: vec![] };
         for (_id, card_set) in deck {
             Vec::append(&mut card_stack.stack, &mut card_set.open());
