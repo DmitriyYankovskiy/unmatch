@@ -26,8 +26,9 @@ async fn game_controller(data: web::Data<Mutex<game::Game>>) -> impl Responder {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-struct DeckName {
+pub struct Player {
     name: String,
+    character_name: String,
 }
 
 fn file_response(path: String) -> HttpResponse {
@@ -38,9 +39,9 @@ fn file_response(path: String) -> HttpResponse {
 }
 
 #[get("/game/connect")]
-async fn game_connect(data: web::Data<Mutex<game::GameState>>, json: web::Json<DeckName>) -> impl Responder {
+async fn game_connect(data: web::Data<Mutex<game::GameState>>, json: web::Json<Player>) -> impl Responder {
     let mut game = data.lock().unwrap();
-    match game.add_player(&json.name) {
+    match game.add_player(json.0) {
         Ok(id) => {
             file_response("game/index.html".to_string())
         },
