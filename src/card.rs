@@ -47,6 +47,8 @@ pub mod combat {
         immidietly: Vec<Actions>,
         during_combat: Vec<Actions>,
         after_combat: Vec<Actions>,
+
+        #[serde(rename = "type")]
         class: Class,
     }
 }
