@@ -62,12 +62,16 @@ pub enum Class {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Card {
+    name: String,
+
+    #[serde(rename = "type")]
     class: Class,
+    
     fighter: Fighter,
     boost: u32,
 }
 
-pub type Deck = HashMap<String, Set<Card>>;
+pub type Deck = Vec<Set<Card>>;
 
 impl Readable for Deck {
     fn from_path(path: String) -> Result<Self> {
@@ -86,7 +90,7 @@ pub struct CardStack {
 impl CardStack {
     pub fn from(deck: &Deck) -> CardStack {
         let mut card_stack = CardStack { stack: vec![] };
-        for (_id, card_set) in deck {
+        for card_set in deck {
             Vec::append(&mut card_stack.stack, &mut card_set.open());
         }
         card_stack

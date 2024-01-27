@@ -4,7 +4,7 @@ use reqwest::Response;
 use serde::{Serialize, Deserialize};
 pub use set::Set;
 use std::ops::Deref;
-pub use std::{fs, io::Result, sync::Mutex};
+pub use std::{fs, io::Result, sync::Mutex, collections::HashMap};
 // use std::fs::File::file_stream;
 
 mod card;
@@ -26,9 +26,9 @@ async fn game_controller() -> impl Responder {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Player {
+pub struct PlayerInfo<T> {
     name: String,
-    character_name: String,
+    info: T,
 }
 
 fn file_response(path: String) -> HttpResponse {
@@ -39,7 +39,7 @@ fn file_response(path: String) -> HttpResponse {
 }
 
 #[get("/game/connect")]
-async fn game_connect(data: web::Data<Mutex<game::GameState>>, json: web::Json<Player>) -> impl Responder {
+async fn game_connect(data: web::Data<Mutex<game::GameState>>, json: web::Json<PlayerInfo<String>>) -> impl Responder {
     let mut game = data.lock().unwrap();
     match game.add_player(json.0) {
         Ok(id) => {

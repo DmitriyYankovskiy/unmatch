@@ -1,7 +1,6 @@
 use crate::{card, Readable};
 use set::Set;
 use std::{
-    collections::HashMap,
     fs,
     io::{Result, Write},
     ops::{Deref, DerefMut},
@@ -27,11 +26,12 @@ pub struct Sidekick {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct CharacterState {
-    health: usize,
-    attack_type: AttackType,
-    abilities: Vec<card::Actions>,
-    sidekick: Option<Set<Sidekick>>,
+pub struct Character {
+    pub name: String,
+    pub health: usize,
+    pub attack_type: AttackType,
+    pub abilities: Vec<card::Actions>,
+    pub sidekick: Option<Set<Sidekick>>,
 }
 
 pub type Pos = i32;
@@ -62,12 +62,10 @@ impl<T> DerefMut for MovableObject<T> {
     }
 }
 
-pub type Characters = HashMap<String, CharacterState>;
-
-impl Readable for Characters {
+impl Readable for Vec<Character> {
     fn from_path(name: String) -> Result<Self> {
         let file = fs::read_to_string(format!("data/{name}.json"))?;
-        let characters: Characters = serde_json::from_str(file.as_str())?;
+        let characters: Vec<Character> = serde_json::from_str(file.as_str())?;
         return Ok(characters);
     }
 }

@@ -1,7 +1,8 @@
-{
-   "name":{
+[
+   {
+      "name": "Bob",
       "abilities":[
-          
+         
       ],
       "attack_type":"Ranged",
       "health":10,
@@ -12,4 +13,4 @@
          "name":"side name"      
       }
    }
-}
+]
