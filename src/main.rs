@@ -18,7 +18,7 @@ pub trait Readable {
 }
 
 #[get("/game")]
-async fn game_controller(data: web::Data<Mutex<game::Game>>) -> impl Responder {
+async fn game_controller() -> impl Responder {
     file_response("game/index.html".to_string())
 }
 
@@ -50,7 +50,6 @@ async fn game_connect(data: web::Data<Mutex<game::GameState>>, json: web::Json<P
         }
     }
 }
-
 
 #[actix_web::main]
 async fn main() -> Result<()> {
