@@ -1,6 +1,7 @@
 use actix_web::HttpRequest;
 pub use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 pub use handlebars::Handlebars;
+use handlebars::{HelperDef, HelperResult, JsonRender};
 use reqwest::Response;
 use serde::{Serialize, Deserialize};
 use serde_json::json;
@@ -27,6 +28,13 @@ pub struct PlayerInfo<T> {
     info: T,
 }
 
+fn file_to_string(path: String) -> String {
+    match fs::read_to_string(format!("www/{}", path)) {
+        Ok(file) => file,
+        Err(..) => "Error(dont find file)".to_string(),
+    }
+} 
+
 fn file_response(path: String, hbs_data: web::Data<Handlebars<'_>>) -> HttpResponse {
     match fs::read_to_string(format!("www/{}", path)) {
         Ok(file) => HttpResponse::Ok().content_type("text/html")
@@ -44,7 +52,7 @@ fn file_response(path: String, hbs_data: web::Data<Handlebars<'_>>) -> HttpRespo
 
 #[get("/game")]
 async fn game_controller(hbs_data: web::Data<Handlebars<'_>>) -> impl Responder {
-    file_response("game/index.html".to_string(), hbs_data)
+    file_response("game/index.html".to_string(), hbs_data) 
 }
 
 #[get("/game/connect")]
@@ -63,8 +71,16 @@ async fn game_connect(game_data: web::Data<Mutex<game::GameState>>, hbs_data: we
 #[actix_web::main]
 async fn main() -> Result<()> {
     let game_data = web::Data::new(Mutex::new(game::GameState::new()));
-    let hbs = Handlebars::new();
-    //hbs.r
+    let mut hbs = Handlebars::new();
+    hbs.register_helper("partial", Box::new(
+        |h: &handlebars::Helper, hbs: &Handlebars, ctx: &handlebars::Context, rc: &mut handlebars::RenderContext, out: &mut dyn handlebars::Output| -> HelperResult {
+            let name =
+            h.param(0).ok_or(handlebars::RenderErrorReason::ParamNotFoundForIndex("closure-helper", 0))?;
+
+            out.write(file_to_string(name.value().render()).as_str())?;
+            Ok(())
+        }
+    ));
     let hbs_data: web::Data<Handlebars<'_>> = web::Data::new(hbs);
     HttpServer::new(move || 
         App::new()
