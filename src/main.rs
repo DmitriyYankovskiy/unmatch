@@ -14,6 +14,7 @@ pub use std::{fs, io::Result, sync::Mutex, collections::HashMap};
 mod card;
 mod character;
 mod game;
+mod map;
 
 pub trait Readable {
     fn from_path(path: String) -> Result<Self>
