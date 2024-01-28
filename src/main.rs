@@ -36,9 +36,9 @@ fn file_to_string(path: String) -> String {
 } 
 
 fn file_response(path: String, hbs_data: web::Data<Handlebars<'_>>) -> HttpResponse {
-    match fs::read_to_string(format!("www/{}", path)) {
+    match fs::read_to_string("www/all/layout.html") {
         Ok(file) => HttpResponse::Ok().content_type("text/html")
-        .body(match hbs_data.render_template(&file, &json!({"title": "TITLE"})) {
+        .body(match hbs_data.render_template(&file, &json!({"title": "TITLE", "page": path})) {
             Ok(file) => file,
             Err(..) => return HttpResponse::Forbidden().body("403"),
         }),
@@ -68,10 +68,7 @@ async fn game_connect(game_data: web::Data<Mutex<game::GameState>>, hbs_data: we
     }
 }
 
-#[actix_web::main]
-async fn main() -> Result<()> {
-    let game_data = web::Data::new(Mutex::new(game::GameState::new()));
-    let mut hbs = Handlebars::new();
+fn hbs_init(hbs: &mut Handlebars) {
     hbs.register_helper("partial", Box::new(
         |h: &handlebars::Helper, hbs: &Handlebars, ctx: &handlebars::Context, rc: &mut handlebars::RenderContext, out: &mut dyn handlebars::Output| -> HelperResult {
             let name =
@@ -81,6 +78,15 @@ async fn main() -> Result<()> {
             Ok(())
         }
     ));
+}
+
+#[actix_web::main]
+async fn main() -> Result<()> {
+    let game_data = web::Data::new(Mutex::new(game::GameState::new()));
+    let mut hbs: Handlebars<'_> = Handlebars::new();
+
+    hbs_init(&mut hbs);
+
     let hbs_data: web::Data<Handlebars<'_>> = web::Data::new(hbs);
     HttpServer::new(move || 
         App::new()
