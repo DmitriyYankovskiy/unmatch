@@ -1,6 +1,7 @@
-use actix_web::HttpRequest;
+use actix_web::{web::Json, HttpRequest};
 pub use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 pub use handlebars::Handlebars;
+use handlebars::JsonValue;
 use handlebars::{HelperDef, HelperResult, JsonRender};
 use reqwest::Response;
 use serde::{Serialize, Deserialize};
@@ -35,10 +36,10 @@ fn file_to_string(path: String) -> String {
     }
 } 
 
-fn file_response(path: String, hbs_data: web::Data<Handlebars<'_>>) -> HttpResponse {
-    match fs::read_to_string("www/all/layout.html") {
+fn file_in_layout_response(layout_path: String, options: JsonValue, hbs_data: web::Data<Handlebars<'_>>) -> HttpResponse {
+    match fs::read_to_string(format!("www/layouts/{}.html", layout_path)) {
         Ok(file) => HttpResponse::Ok().content_type("text/html")
-        .body(match hbs_data.render_template(&file, &json!({"title": "TITLE", "page": path})) {
+        .body(match hbs_data.render_template(&file, &options) {
             Ok(file) => file,
             Err(..) => return HttpResponse::Forbidden().body("403"),
         }),
@@ -52,7 +53,7 @@ fn file_response(path: String, hbs_data: web::Data<Handlebars<'_>>) -> HttpRespo
 
 #[get("/game")]
 async fn game_controller(hbs_data: web::Data<Handlebars<'_>>) -> impl Responder {
-    file_response("game/index.html".to_string(), hbs_data)
+    file_in_layout_response("main".to_string(), json!({"title": "Game", "page": "game/index.html"}), hbs_data)
 }
 
 #[get("/game/connect")]
@@ -60,7 +61,7 @@ async fn game_connect(game_data: web::Data<Mutex<game::GameState>>, hbs_data: we
     let mut game = game_data.lock().unwrap();
     match game.add_player(json.0) {
         Ok(id) => {
-            file_response("game/index.html".to_string(), hbs_data)
+            file_in_layout_response("main".to_string(), json!({"title": "Game", "page": "game/index.html"}), hbs_data)
         },
         Err(..) => {
             HttpResponse::InternalServerError().body("character not found")
