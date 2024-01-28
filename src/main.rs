@@ -52,7 +52,7 @@ fn file_response(path: String, hbs_data: web::Data<Handlebars<'_>>) -> HttpRespo
 
 #[get("/game")]
 async fn game_controller(hbs_data: web::Data<Handlebars<'_>>) -> impl Responder {
-    file_response("game/index.html".to_string(), hbs_data) 
+    file_response("game/index.html".to_string(), hbs_data)
 }
 
 #[get("/game/connect")]
