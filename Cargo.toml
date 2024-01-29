@@ -6,9 +6,12 @@ edition = "2021"
 [dependencies]
 actix-web = {version = "4.4.1"}
 reqwest = {version = "0.11.23", features = ["json"]}
+
 serde_json = {version = "1.0.99"}
 serde = {version = "1.0", features = ["derive"]}
+
 rand = {version = "0.8.5"}
-set = {version = "0.1.0", git = "https://github.com/DmitriyYankovskiy/set.git"}
 handlebars = {version = "5.1.1"}
-raph = {version = "0.1.0", git = "https://github.com/DmitriyYankovskiy/raph.git"}
+
+set = {version = "*", git = "https://github.com/DmitriyYankovskiy/set.git"}
+raph = {version = "*", git = "https://github.com/DmitriyYankovskiy/raph.git"}

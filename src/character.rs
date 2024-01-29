@@ -1,4 +1,4 @@
-use crate::{card, Readable};
+use crate::{card, Readable, map};
 use set::Set;
 use std::{
     fs,
@@ -32,34 +32,6 @@ pub struct Character {
     pub attack_type: AttackType,
     pub abilities: Vec<card::Actions>,
     pub sidekick: Option<Set<Sidekick>>,
-}
-
-pub type Pos = i32;
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct MovableObject<T> {
-    pos: Pos,
-    object: T,
-}
-
-impl<T> MovableObject<T>{
-    fn move_to(&mut self, pos: Pos) {
-        self.pos = pos;
-    }
-}
-
-impl<T> Deref for MovableObject<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.object
-    }
-}
-
-impl<T> DerefMut for MovableObject<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.object
-    }
 }
 
 impl Readable for Vec<Character> {
