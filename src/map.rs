@@ -9,7 +9,7 @@ struct NodeState{
     area: u32,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct MovableObject<T: Clone> {
     pos: raph::Pos<NodeState, EdgeState>,
     object: T,
